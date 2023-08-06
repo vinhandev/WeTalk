@@ -1,24 +1,39 @@
 const express = require("express");
 const app = express();
-const http = require("http");
-const server = http.createServer(app);
-const { Server } = require("socket.io");
-const io = new Server(server);
+const PORT = 4000;
 
-app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/index.html");
+//New imports
+const http = require("http");
+const cors = require("cors");
+
+const { Server } = require("socket.io");
+
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+  },
 });
 
 io.on("connection", (socket) => {
-  socket.broadcast.emit('hi');
-  socket.on("chat message", (msg) => {
-    io.emit('chat message', msg);
+  console.log(`⚡: ${socket.id} user just connected!`);
+  socket.on("join_room", (data) => {
+    socket.join('123');
   });
+  
+  socket.on("send_message", (data) => {
+    socket.to('123').emit("receive_message", `${socket.id}: ${data}`);
+  });
+  
   socket.on("disconnect", () => {
-    console.log("user disconnected");
+    console.log("🔥: A user disconnected");
   });
 });
 
-server.listen(3000, () => {
-  console.log("Listening on *:3000");
+app.use(cors());
+
+server.listen(PORT, () => {
+  console.log(`Server listening on ${PORT}`);
 });
