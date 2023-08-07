@@ -39,15 +39,17 @@ export default function App() {
 
   useEffect(() => {
     function onFooEvent(value: any) {
+      console.log(value);
+
       setFooEvents((previous: any) => [...previous, value]);
     }
-    
+
     socket.on('receive_message', onFooEvent);
 
     return () => {
       socket.off('receive_message', onFooEvent);
     };
-  }, [socket]);
+  }, [socket, fooEvents]);
 
   return (
     <div className="App">
