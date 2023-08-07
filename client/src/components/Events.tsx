@@ -1,11 +1,18 @@
+import { Stack } from '@mui/material';
 import React from 'react';
 
 export function Events({ events }: any) {
   return (
-    <ul>
+    <Stack
+      sx={{
+        border: '1px solid black',
+        padding: 3,
+        marginY: 1,
+      }}
+    >
       {events.map((event: any, index: number) => (
         <li key={index}>{event}</li>
       ))}
-    </ul>
+    </Stack>
   );
 }

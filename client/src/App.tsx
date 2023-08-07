@@ -1,22 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { ConnectionState } from './components/ConnectionState';
-import { ConnectionManager } from './components/ConnectionManager';
-import { MyForm } from './components/MyForm';
+import { useState, useEffect } from 'react';
 import { socket } from './socket';
-import { Events } from './components/Events';
-import { Button } from '@mui/material';
+import { Button, Stack } from '@mui/material';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Chatroom from './pages/Chatroom';
+import Authorization from './pages/Authorization';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 export default function App() {
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [fooEvents, setFooEvents] = useState<any>([]);
-  const [joinRoom, setJoinRoom] = useState<{
-    name: string;
-    room: string;
-    time: Date;
-  }>();
 
-  function onJoinRoom() {
-    socket.emit('join_room', '123');
+  function connect() {
+    socket.connect();
+  }
+
+  function disconnect() {
+    socket.disconnect();
   }
 
   useEffect(() => {
@@ -51,13 +50,33 @@ export default function App() {
     };
   }, [socket, fooEvents]);
 
+  const queryClient = new QueryClient();
+
+  const token = localStorage.getItem('token');
+
   return (
-    <div className="App">
-      <ConnectionState isConnected={isConnected} />
-      <Events events={fooEvents} />
-      <Button onClick={onJoinRoom}>Join Room</Button>
-      <ConnectionManager />
-      <MyForm />
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <Stack>
+        {isConnected ? (
+          <Stack>
+            {/* <Button onClick={disconnect}>Disconnect</Button> */}
+            <BrowserRouter>
+              <Routes>
+                {token !== null ? (
+                  <Route
+                    path="/"
+                    element={<Chatroom fooEvents={fooEvents} />}
+                  />
+                ) : (
+                  <Route path="/" element={<Authorization />} />
+                )}
+              </Routes>
+            </BrowserRouter>
+          </Stack>
+        ) : (
+          <Button onClick={connect}>Connect</Button>
+        )}
+      </Stack>
+    </QueryClientProvider>
   );
 }

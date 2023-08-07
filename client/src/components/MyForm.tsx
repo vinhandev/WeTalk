@@ -1,18 +1,15 @@
 import React, { useState } from 'react';
 import { socket } from '../socket';
 
-export function MyForm() {
-  const [value, setValue] = useState('');
+interface Props {
+  setValue: (value: string) => void;
+  onSubmit: (e: any) => void;
+}
 
-  function onSubmit(event: any) {
-    event.preventDefault();
-    socket.emit('send_message', value);
-  }
-
+export function MyForm({ onSubmit, setValue }: Props) {
   return (
     <form onSubmit={onSubmit}>
       <input onChange={(e) => setValue(e.target.value)} />
-
       <button type="submit">Submit</button>
     </form>
   );

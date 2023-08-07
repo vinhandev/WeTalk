@@ -73,7 +73,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("send_message", (data) => {
-    io.in("123").emit("receive_message", `${socket.id}: ${data}`);
+    io.in("123").emit("receive_message", `${data.username}: ${data.message}`);
   });
 
   socket.on("disconnect", () => {
